@@ -93,7 +93,7 @@ def render(us, ca, funds, meta, tweets=None, thirteenf=None):
     A('<div class="hero"><canvas id="stars"></canvas><div class="hero-in">'
       '<div class="brand"><span class="eyebrow">Daily Shariah-Screened Equity Review</span>'
       '<h1>Halal Market Ledger</h1>'
-      '<p class="sub">Sixty Shariah-screened securities &mdash; 35 US stocks, 13 TSX listings and 12 halal '
+      '<p class="sub">112 Shariah-screened securities &mdash; 50 US stocks, 50 TSX listings and 12 halal '
       'funds &mdash; ranked on a single 105-point value-and-quality model.</p></div>'
       '<div class="stamp"><span class="live">%s</span><span class="big">%s</span>'
       '<span class="sm">Quotes captured %s</span>'
@@ -105,7 +105,7 @@ def render(us, ca, funds, meta, tweets=None, thirteenf=None):
       '<a href="#b"><span class="k">B</span>US Overview</a>'
       '<a href="#c"><span class="k">C</span>US Financial Health</a>'
       '<a href="#d"><span class="k">D</span>Top 5 US Picks</a>'
-      '<a href="#e"><span class="k">E</span>All 35 US Names</a>'
+      '<a href="#e"><span class="k">E</span>All 50 US Names</a>'
       '<a href="#f"><span class="k">F</span>Canada</a>'
       '<a href="#g"><span class="k">G</span>Halal Funds</a>'
       '<a href="#h"><span class="k">H</span>Notes &amp; Watchpoints</a>'
@@ -120,7 +120,7 @@ def render(us, ca, funds, meta, tweets=None, thirteenf=None):
           '<span class="m">score %.1f%s</span></div>'
           % (e(top["ticker"]), top["score"],
              " &middot; %+.0f%% upside" % top["upside"] if top.get("upside") else ""))
-    for lab, key, note in [("Strong Buy","Strong Buy","of 48 stocks"),
+    for lab, key, note in [("Strong Buy","Strong Buy","of 100 stocks"),
                            ("Buy","Buy","score 65&ndash;79"),
                            ("Hold","Hold","score 48&ndash;64")]:
         A('<div class="sc"><span class="l">%s</span><span class="v">%d</span>'
@@ -151,7 +151,7 @@ def render(us, ca, funds, meta, tweets=None, thirteenf=None):
         A('</div></div>')
     A('</div>')
     A('''<div class="method"><h3>The 105-point score</h3>
-<p>Every one of the 48 stocks is scored identically. Six components are graded on sliding scales &mdash; no
+<p>Every one of the 100 stocks is scored identically. Six components are graded on sliding scales &mdash; no
 arbitrary cut-offs inside a component &mdash; and summed. The weighting deliberately puts more on the balance
 sheet (D/E plus current ratio = 35 points) than on the analyst target (26 points), because forecasts are
 opinions and the balance sheet is a fact.</p>
@@ -408,7 +408,7 @@ opinions and the balance sheet is a fact.</p>
           'should be read as partly unassessed.</p>'
           % (len(gaps), ", ".join(e(r["ticker"]) for r in gaps[:14])))
     else:
-        A('<p><strong>No data gaps.</strong> All 48 stocks returned a complete ratio set.</p>')
+        A('<p><strong>No data gaps.</strong> All 100 stocks returned a complete ratio set.</p>')
     if extreme:
         A('<p><strong>Extreme but verified:</strong> %s.</p>'
           % ", ".join("%s (P/E %s, D/E %s, P/B %s)"

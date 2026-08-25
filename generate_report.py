@@ -3,7 +3,7 @@
 """
 Halal Market Ledger — daily report generator.
 
-Fetches the 60-security universe, scores the 48 stocks, writes today's report
+Fetches the 112-security universe, scores the 100 stocks, writes today's report
 page, appends the run to data/history.json and rebuilds index.html.
 
     python3 generate_report.py            # normal run
@@ -34,7 +34,7 @@ REPORT_HEAD = '''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Halal Market Ledger — %(label)s</title>
-<meta name="description" content="Shariah-screened review of 60 securities for %(label)s.">
+<meta name="description" content="Shariah-screened review of 112 securities for %(label)s.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%%22http://www.w3.org/2000/svg%%22 viewBox=%%220 0 100 100%%22><text y=%%22.9em%%22 font-size=%%2290%%22>&#127769;</text></svg>">
 <style>*{margin:0;padding:0}</style>
 </head>
@@ -152,7 +152,9 @@ def main():
     log("fetching %d US stocks..." % len(US_STOCKS))
     us_raw = gather(US_STOCKS, fetch_stock, "US", failures)
     log("fetching %d Canadian stocks..." % len(CA_STOCKS))
-    ca_raw = gather([t + ".TO" for t in CA_STOCKS], fetch_stock, "Canada", failures)
+    # TSX dot notation for share classes (e.g. "TECK.B") maps to a dash on Yahoo
+    # Finance ("TECK-B.TO", not "TECK.B.TO" — verified live against the chart API).
+    ca_raw = gather([t.replace(".", "-") + ".TO" for t in CA_STOCKS], fetch_stock, "Canada", failures)
     log("fetching %d funds..." % len(FUNDS))
     fu_raw = gather(FUNDS, fetch_fund, "Funds", failures)
 

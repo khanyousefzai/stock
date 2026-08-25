@@ -1,6 +1,6 @@
 # Halal Market Ledger
 
-A daily Shariah-screened equity review. Sixty securities — 35 US stocks, 13 TSX
+A daily Shariah-screened equity review. 112 securities — 50 US stocks, 50 TSX
 listings and 12 halal ETFs and funds — scored each trading day on a single
 105-point value-and-quality model, published as a static site.
 
@@ -43,7 +43,7 @@ generate_report.py       Daily entry point — fetch, score, write, archive
   scoring.py               105-point model, guardrails, colour bands, commentary
   render_report.py         Renders one day's report page
   report_css.py            Report stylesheet
-  universe.py              The 60 tickers + Shariah screen membership
+  universe.py              The 112 tickers + Shariah screen membership
   investor_tweets.py       Optional: watched-account cashtag mentions (needs X_BEARER_TOKEN)
   thirteen_f.py            Free: watched investors' latest SEC 13F holdings, no key needed
 build_site.py            Rebuilds index.html from data/history.json
@@ -65,8 +65,8 @@ requirements.txt         Python dependencies
 Nothing manual. `.github/workflows/daily.yml` runs on a cron schedule and does
 the whole job inside GitHub Actions:
 
-1. Fetches all 60 securities from Yahoo Finance (`generate_report.py`)
-2. Scores the 48 stocks and applies the guardrails
+1. Fetches all 112 securities from Yahoo Finance (`generate_report.py`)
+2. Scores the 100 stocks and applies the guardrails
 3. Writes `reports/YYYY-MM-DD.html`
 4. Appends the run to `data/history.json`
 5. Rebuilds `index.html`
@@ -87,7 +87,7 @@ source still works without touching the archive.
 
 ### If a run fails
 
-The job aborts and writes nothing if fewer than 80% of the 48 stocks fetch
+The job aborts and writes nothing if fewer than 80% of the 100 stocks fetch
 successfully, so a bad upstream day leaves the site untouched rather than
 publishing a half-empty report. Individual failures are listed in the report's
 Data Quality box and in the Actions log.
@@ -120,12 +120,12 @@ so backfilled entries carry today's ratios with an older label.
   "best_ca": {"t":"STN","n":"Stantec Inc.","p":101.55,"c":-0.33,"s":73.7,"u":38.2},
   "top_etf": {"t":"SPUS","n":"SP Funds S&P 500 Sharia ETF","p":58.21,"c":-0.70},
   "note":    "Auto-generated one-line session summary.",
-  "us":      [{"t":"MU","p":906.0,"c":-6.29,"s":95.8,"v":"Strong Buy"}],  // all 35
-  "ca":      [{"t":"STN","p":101.55,"c":-0.33,"s":73.7,"v":"Buy"}]        // all 13
+  "us":      [{"t":"MU","p":906.0,"c":-6.29,"s":95.8,"v":"Strong Buy"}],  // all 50
+  "ca":      [{"t":"STN","p":101.55,"c":-0.33,"s":73.7,"v":"Buy"}]        // all 50
 }
 ```
 
-Keys are short because they repeat 48 times per run: `t` ticker, `n` name,
+Keys are short because they repeat 100 times per run: `t` ticker, `n` name,
 `p` price, `c` day change %, `s` score, `u` upside %, `v` verdict.
 The `us`/`ca` arrays drive the score-trend sparklines.
 
@@ -133,7 +133,7 @@ The `us`/`ca` arrays drive the score-trend sparklines.
 
 `investor_tweets.py` pulls recent posts from a short list of watched X/Twitter
 accounts (`WATCHED` in that file — currently Bill Ackman, Michael Burry, Chamath
-Palihapitiya) and keeps only the ones that cashtag a ticker in the 60-security
+Palihapitiya) and keeps only the ones that cashtag a ticker in the 112-security
 universe. It renders as section I on the report page when there's a match.
 
 This needs an X API v2 **developer account on a paid plan** — the free tier
@@ -187,13 +187,22 @@ string "github.com" — not documented anywhere, just tested and worked around.
 holdings as files rather than an API, and a wrong screen is worse than a stale one.
 
 Re-check it periodically against sp-funds.com (SPUS) and wahedinvest.com (HLAL),
-update the dict and the date. As of 2026-08-24: SPUS held 34 of the 35 US names,
-HLAL held 32; ORCL and HD are in SPUS but not HLAL; ASML is in neither because
-both funds track US-only universes.
+update the dict and the date. As of 2026-08-25: SPUS holds 49 of the 50 US names
+(only ASML isn't, being NL-domiciled — both funds track US-only universes). HLAL
+is confirmed for 36 of them; the other 11 (added alongside SPUS on 2026-08-25)
+default to `hlal: False` in `SCREENS` not because they're excluded but because
+wahedinvest.com blocks automated fetches and their status hasn't been checked yet
+— re-verify by hand and flip the flag once confirmed either way.
+
+The 50 Canadian names have no index-fund Shariah screen at all — SPUS and HLAL
+are both US-domiciled and structurally can't hold TSX listings. They're screened
+by hand for permissible business lines only (see the comment above `CA_STOCKS`
+in `universe.py` for the exclusion categories); the financial-ratio and
+purification screens still need checking individually, same as before.
 
 ## Scoring
 
-Each of the 48 stocks is scored out of 105:
+Each of the 100 stocks is scored out of 105:
 
 | Component        | Points |
 |------------------|--------|

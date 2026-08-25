@@ -37,7 +37,7 @@ HEAD = '''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>%(title)s</title>
-<meta name="description" content="Daily Shariah-screened equity review — 60 securities scored every trading day.">
+<meta name="description" content="Daily Shariah-screened equity review — 112 securities scored every trading day.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%%22http://www.w3.org/2000/svg%%22 viewBox=%%220 0 100 100%%22><text y=%%22.9em%%22 font-size=%%2290%%22>🌙</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,7 +71,7 @@ def build_index(hist):
     A('<div class="hero"><canvas id="stars"></canvas><div class="hero-in">')
     A('<div class="brand"><span class="eyebrow">Daily Shariah-Screened Equity Review</span>'
       '<h1>Halal Market Ledger</h1>'
-      '<p class="sub">Sixty Shariah-screened securities &mdash; 35 US stocks, 13 TSX listings and 12 halal funds &mdash; '
+      '<p class="sub">112 Shariah-screened securities &mdash; 50 US stocks, 50 TSX listings and 12 halal funds &mdash; '
       'ranked on a single 105-point value-and-quality model. A new report every trading day, all of them kept here.</p></div>')
     A('<div class="stamp">')
     if latest:
@@ -105,7 +105,7 @@ def build_index(hist):
               '<span class="m">%s &middot; %s</span></div>'
               % (e(te['t']), money(te['p']), sgn(te.get('c'))))
         A('<div class="sc"><span class="l">US avg move</span><span class="v">%s</span>'
-          '<span class="m">35 names</span></div>' % sgn(latest.get('us_avg')))
+          '<span class="m">50 names</span></div>' % sgn(latest.get('us_avg')))
         A('</div>')
         if latest.get('note'):
             A('<p class="note">%s</p>' % e(latest['note']))
