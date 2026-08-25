@@ -20,6 +20,7 @@ sys.path.insert(0, ROOT)
 from universe import US_STOCKS, CA_STOCKS, FUNDS
 from fetch_data import fetch_stock, fetch_fund, reconcile, FetchError
 from scoring import evaluate
+import investor_tweets
 import render_report
 import build_site
 
@@ -174,8 +175,14 @@ def main():
         log("dry run — nothing written")
         return 0
 
+    # ---- investor chatter (optional — never blocks a run) ----
+    universe_tickers = [r["ticker"] for r in us] + [r["ticker"] for r in ca] + [f[0] for f in FUNDS]
+    tweets = investor_tweets.fetch(universe_tickers, log=log)
+    if tweets:
+        log("investor tweets: %d matching mention(s)" % len(tweets))
+
     # ---- report page ----
-    body = render_report.render(us, ca, fu_raw, meta)
+    body = render_report.render(us, ca, fu_raw, meta, tweets)
     page = (REPORT_HEAD % {"label": label}) + body + (REPORT_TAIL % STARS_JS)
     os.makedirs(os.path.join(ROOT, "reports"), exist_ok=True)
     rp = os.path.join(ROOT, "reports", "%s.html" % today.isoformat())

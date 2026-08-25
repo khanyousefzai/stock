@@ -44,6 +44,7 @@ generate_report.py       Daily entry point — fetch, score, write, archive
   render_report.py         Renders one day's report page
   report_css.py            Report stylesheet
   universe.py              The 60 tickers + Shariah screen membership
+  investor_tweets.py       Optional: watched-account cashtag mentions (needs X_BEARER_TOKEN)
 build_site.py            Rebuilds index.html from data/history.json
 index.html               Landing page (generated; do not hand-edit)
 data/history.json        Machine-readable archive: one entry per run
@@ -126,6 +127,27 @@ so backfilled entries carry today's ratios with an older label.
 Keys are short because they repeat 48 times per run: `t` ticker, `n` name,
 `p` price, `c` day change %, `s` score, `u` upside %, `v` verdict.
 The `us`/`ca` arrays drive the score-trend sparklines.
+
+## Investor chatter (optional)
+
+`investor_tweets.py` pulls recent posts from a short list of watched X/Twitter
+accounts (`WATCHED` in that file — currently Bill Ackman, Michael Burry, Chamath
+Palihapitiya) and keeps only the ones that cashtag a ticker in the 60-security
+universe. It renders as section I on the report page when there's a match.
+
+This needs an X API v2 **developer account on a paid plan** — the free tier
+cannot read timelines. Without a token the pipeline runs exactly as before;
+the section is silently omitted and nothing fails.
+
+To enable it:
+
+1. Get a Bearer Token from [developer.x.com](https://developer.x.com).
+2. **Settings → Secrets and variables → Actions → New repository secret** —
+   name it `X_BEARER_TOKEN`, paste the token.
+3. Next run picks it up automatically; no code changes needed.
+
+Treat every match as chatter to read, not a trade signal — these accounts
+comment publicly far more than they disclose actual positions.
 
 ## Keeping the Shariah screens current
 

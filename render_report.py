@@ -75,8 +75,9 @@ RATIO_CARDS = [
 ]
 
 
-def render(us, ca, funds, meta):
-    """us/ca: scored rows sorted by score desc. funds: fund rows. meta: dict."""
+def render(us, ca, funds, meta, tweets=None):
+    """us/ca: scored rows sorted by score desc. funds: fund rows. meta: dict.
+    tweets: optional list from investor_tweets.fetch(), or None/[] to omit the section."""
     P, A = [], None
     A = P.append
     A(REPORT_CSS)
@@ -107,6 +108,7 @@ def render(us, ca, funds, meta):
       '<a href="#f"><span class="k">F</span>Canada</a>'
       '<a href="#g"><span class="k">G</span>Halal Funds</a>'
       '<a href="#h"><span class="k">H</span>Notes &amp; Watchpoints</a>'
+      + ('<a href="#i"><span class="k">I</span>Investor Chatter</a>' if tweets else '') +
       '</div></nav>')
 
     A('<div class="wrap">')
@@ -417,6 +419,24 @@ opinions and the balance sheet is a fact.</p>
     A('<p><strong>Screen membership</strong> is from the issuers\' own holdings files, last refreshed %s. '
       'Re-check it periodically &mdash; index constituents change.</p>' % e(SCREENS_ASOF))
     A('</div></div>')
+
+    # ---------- I ----------
+    if tweets:
+        A('<section id="i"><div class="sec-head"><span class="sec-key">I</span>'
+          '<h2>Investor chatter</h2>'
+          '<span class="sec-note">Recent posts from watched accounts mentioning a ticker in this universe</span></div>')
+        A('<p class="lede">A mention here is <strong>not confirmation of a trade</strong> &mdash; these '
+          'accounts comment publicly far more often than they disclose actual positions, and a cashtag in a '
+          'post can be praise, criticism, or a joke. Read it as chatter to follow up on, not a signal.</p>')
+        A('<div class="ngrid">')
+        for tw in tweets:
+            A('<div class="ncard"><h3>%s <span style="color:var(--ink-3);font-weight:400">&middot; %s</span></h3>'
+              '<p>%s</p><p style="margin-top:6px;font-size:12.5px">'
+              '<span class="badge b-buy">%s</span> &middot; '
+              '<a href="%s" style="color:var(--jade)">view post</a></p></div>'
+              % (e(tw["name"]), e(tw["firm"]), e(tw["text"]),
+                 " &middot; ".join(e(t) for t in tw["tickers"]), e(tw["url"])))
+        A('</div></section>')
 
     A('<div class="disc"><b>Not investment advice.</b> This is an automated daily screen, not a '
       'recommendation to buy or sell anything. The scores are the output of a fixed formula applied to '

@@ -40,6 +40,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Generate today's report
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python3 generate_report.py --dry-run
