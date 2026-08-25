@@ -45,6 +45,7 @@ generate_report.py       Daily entry point — fetch, score, write, archive
   report_css.py            Report stylesheet
   universe.py              The 60 tickers + Shariah screen membership
   investor_tweets.py       Optional: watched-account cashtag mentions (needs X_BEARER_TOKEN)
+  thirteen_f.py            Free: watched investors' latest SEC 13F holdings, no key needed
 build_site.py            Rebuilds index.html from data/history.json
 index.html               Landing page (generated; do not hand-edit)
 data/history.json        Machine-readable archive: one entry per run
@@ -148,6 +149,21 @@ To enable it:
 
 Treat every match as chatter to read, not a trade signal — these accounts
 comment publicly far more than they disclose actual positions.
+
+## 13F holdings (free, on by default)
+
+`thirteen_f.py` is the no-key alternative to investor chatter: it pulls each
+watched investor's most recent Form 13F-HR — the quarterly holdings
+disclosure the SEC requires from every institutional manager over $100M —
+straight from SEC EDGAR, and flags any position that overlaps the universe.
+No signup, no token, nothing to configure. Renders as section J when there's
+a match.
+
+It's a quarterly snapshot, not a live signal — 13F filings can lag up to 45
+days after quarter end, so a position shown here may already have changed by
+the time you read it. SEC EDGAR asks every requester to identify themselves
+with a User-Agent header (name + contact); the default in `thirteen_f.py`
+works as-is, or set `SEC_EDGAR_USER_AGENT` to use your own.
 
 ## Keeping the Shariah screens current
 

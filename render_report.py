@@ -75,9 +75,10 @@ RATIO_CARDS = [
 ]
 
 
-def render(us, ca, funds, meta, tweets=None):
+def render(us, ca, funds, meta, tweets=None, thirteenf=None):
     """us/ca: scored rows sorted by score desc. funds: fund rows. meta: dict.
-    tweets: optional list from investor_tweets.fetch(), or None/[] to omit the section."""
+    tweets: optional list from investor_tweets.fetch(), or None/[] to omit the section.
+    thirteenf: optional list from thirteen_f.fetch(), or None/[] to omit the section."""
     P, A = [], None
     A = P.append
     A(REPORT_CSS)
@@ -108,7 +109,8 @@ def render(us, ca, funds, meta, tweets=None):
       '<a href="#f"><span class="k">F</span>Canada</a>'
       '<a href="#g"><span class="k">G</span>Halal Funds</a>'
       '<a href="#h"><span class="k">H</span>Notes &amp; Watchpoints</a>'
-      + ('<a href="#i"><span class="k">I</span>Investor Chatter</a>' if tweets else '') +
+      + ('<a href="#i"><span class="k">I</span>Investor Chatter</a>' if tweets else '')
+      + ('<a href="#j"><span class="k">J</span>13F Holdings</a>' if thirteenf else '') +
       '</div></nav>')
 
     A('<div class="wrap">')
@@ -437,6 +439,25 @@ opinions and the balance sheet is a fact.</p>
               % (e(tw["name"]), e(tw["firm"]), e(tw["text"]),
                  " &middot; ".join(e(t) for t in tw["tickers"]), e(tw["url"])))
         A('</div></section>')
+
+    # ---------- J ----------
+    if thirteenf:
+        A('<section id="j"><div class="sec-head"><span class="sec-key">J</span>'
+          '<h2>13F holdings</h2>'
+          '<span class="sec-note">Latest SEC Form 13F-HR filings, cross-checked against this universe</span></div>')
+        A('<p class="lede">Free, official, and exact &mdash; every institutional manager over $100M must '
+          'disclose these quarterly. But it is a <strong>quarterly snapshot, not a live signal</strong>: 13F '
+          'filings can lag up to 45 days after quarter end, and a position shown here may already have been '
+          'trimmed or exited by the time you read this.</p>')
+        A('<div class="tw"><table><thead><tr><th>Investor</th><th>Firm</th><th>Holding</th>'
+          '<th class="num">Value</th><th class="num">Shares</th><th>Filed</th></tr></thead><tbody>')
+        for h in thirteenf:
+            A('<tr><td class="nm"><span class="co">%s</span></td><td class="sect">%s</td>'
+              '<td><span class="tk">%s</span></td><td class="num sco">%s</td>'
+              '<td class="num">%s</td><td class="sect">%s</td></tr>'
+              % (e(h["investor"]), e(h["firm"]), e(h["ticker"]), e(h["value_fmt"]),
+                 "{:,.0f}".format(h["shares"]), e(h["filed"])))
+        A('</tbody></table></div></section>')
 
     A('<div class="disc"><b>Not investment advice.</b> This is an automated daily screen, not a '
       'recommendation to buy or sell anything. The scores are the output of a fixed formula applied to '

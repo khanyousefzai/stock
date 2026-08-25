@@ -21,6 +21,7 @@ from universe import US_STOCKS, CA_STOCKS, FUNDS
 from fetch_data import fetch_stock, fetch_fund, reconcile, FetchError
 from scoring import evaluate
 import investor_tweets
+import thirteen_f
 import render_report
 import build_site
 
@@ -181,8 +182,13 @@ def main():
     if tweets:
         log("investor tweets: %d matching mention(s)" % len(tweets))
 
+    # ---- 13F holdings — free, official, no key required ----
+    thirteenf_hits = thirteen_f.fetch(us + ca, log=log)
+    if thirteenf_hits:
+        log("13F holdings: %d matching position(s)" % len(thirteenf_hits))
+
     # ---- report page ----
-    body = render_report.render(us, ca, fu_raw, meta, tweets)
+    body = render_report.render(us, ca, fu_raw, meta, tweets, thirteenf_hits)
     page = (REPORT_HEAD % {"label": label}) + body + (REPORT_TAIL % STARS_JS)
     os.makedirs(os.path.join(ROOT, "reports"), exist_ok=True)
     rp = os.path.join(ROOT, "reports", "%s.html" % today.isoformat())
