@@ -159,11 +159,26 @@ straight from SEC EDGAR, and flags any position that overlaps the universe.
 No signup, no token, nothing to configure. Renders as section J when there's
 a match.
 
+`WATCHED` currently covers 15 well-known investors: Bill Ackman, Michael
+Burry, Chamath Palihapitiya, Warren Buffett, Carl Icahn, Ray Dalio, Seth
+Klarman, David Tepper, Stanley Druckenmiller, Ken Griffin, Cathie Wood, David
+Einhorn, Daniel Loeb, Nelson Peltz and George Soros. Each entry is `(display
+name, firm, SEC CIK)` — add another by resolving their CIK at
+[sec.gov/cgi-bin/browse-edgar](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany)
+(search by firm name, filter to 13F-HR) rather than guessing; a couple of
+filers route their real 13F-HR through a differently-named related entity
+(see the comment above `WATCHED` for the two cases already worked out).
+Multi-strategy managers in the list (Citadel especially) report the same
+position split across many lots — `fetch()` aggregates those to one row per
+(filer, ticker) before the report caps the table at the 30 largest.
+
 It's a quarterly snapshot, not a live signal — 13F filings can lag up to 45
 days after quarter end, so a position shown here may already have changed by
 the time you read it. SEC EDGAR asks every requester to identify themselves
 with a User-Agent header (name + contact); the default in `thirteen_f.py`
-works as-is, or set `SEC_EDGAR_USER_AGENT` to use your own.
+works as-is, or set `SEC_EDGAR_USER_AGENT` to use your own. One thing found
+the hard way: SEC's edge filter 403s any User-Agent containing the literal
+string "github.com" — not documented anywhere, just tested and worked around.
 
 ## Keeping the Shariah screens current
 
