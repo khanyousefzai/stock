@@ -72,9 +72,9 @@ the whole job inside GitHub Actions:
 5. Rebuilds `index.html`
 6. **Commits and pushes the result**, then deploys to Pages
 
-The schedule is `35 13 * * 1-5` — 13:35 UTC on weekdays, which is 09:35 ET while
+The schedule is `10 13 * * 1-5` — 13:10 UTC on weekdays, which is 09:10 ET while
 US daylight time is in effect. GitHub cron is always UTC and does not follow DST,
-so in winter this lands at 08:35 ET; add a second cron line if you want it pinned.
+so in winter this lands at 08:10 ET; add a second cron line if you want it pinned.
 
 GitHub's scheduled runs are best-effort and can be delayed by several minutes
 during busy periods. That is normal and does not affect the report.
