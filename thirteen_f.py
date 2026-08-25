@@ -33,11 +33,32 @@ USER_AGENT = os.environ.get(
 HEADERS = {"User-Agent": USER_AGENT}
 
 # investor -> (firm, SEC CIK). CIKs are stable identifiers, resolved once
-# against data.sec.gov/submissions and verified against the filer's own name.
+# against data.sec.gov/submissions and verified against the filer's own name
+# and filing history — not from memory. A few notes on the less obvious ones:
+#   - Carl Icahn's holding company (Icahn Capital LP) files a 13F-NT (notice)
+#     that points to a combined report filed personally under his own name —
+#     that personal filer CIK is the one used here.
+#   - Nelson Peltz's Trian has two related CIKs; the GP entity files a
+#     13F-NT, the LP entity files the actual 13F-HR used here.
+#   - David Einhorn's Greenlight Capital's most recent 13F-HR on file is from
+#     2024 — that's genuinely their last filing, not a lookup error; it will
+#     render with an old "filed" date rather than being silently dropped.
 WATCHED = [
     ("Bill Ackman", "Pershing Square Capital Management", "1336528"),
     ("Michael Burry", "Scion Asset Management", "1649339"),
     ("Chamath Palihapitiya", "Social Capital Group", "1964312"),
+    ("Warren Buffett", "Berkshire Hathaway", "1067983"),
+    ("Carl Icahn", "Icahn Enterprises", "921669"),
+    ("Ray Dalio", "Bridgewater Associates", "1350694"),
+    ("Seth Klarman", "Baupost Group", "1061768"),
+    ("David Tepper", "Appaloosa Management", "1656456"),
+    ("Stanley Druckenmiller", "Duquesne Family Office", "1536411"),
+    ("Ken Griffin", "Citadel Advisors", "1423053"),
+    ("Cathie Wood", "ARK Investment Management", "1697748"),
+    ("David Einhorn", "Greenlight Capital", "1079114"),
+    ("Daniel Loeb", "Third Point", "1040273"),
+    ("Nelson Peltz", "Trian Fund Management", "1345471"),
+    ("George Soros", "Soros Fund Management", "1029160"),
 ]
 
 NS = {"n": "http://www.sec.gov/edgar/document/thirteenf/informationtable"}
@@ -133,14 +154,23 @@ def fetch(universe_rows, log=None):
             if not accession:
                 log("13F holdings: no 13F-HR on file for %s" % firm)
                 continue
+            # A filer's 13F often splits one position across several lots
+            # (different accounts, share classes, voting authority) — large
+            # multi-strategy managers like Citadel can report dozens of rows
+            # for the same name. Aggregate to one row per (filer, ticker).
+            by_ticker = {}
             for h in _holdings(cik, accession):
                 ticker = lookup.get(_norm(h["name"]))
                 if not ticker:
                     continue
+                agg = by_ticker.setdefault(ticker, {"issuer": h["name"], "value": 0.0, "shares": 0.0})
+                agg["value"] += h["value"]
+                agg["shares"] += h["shares"]
+            for ticker, agg in by_ticker.items():
                 hits.append({
                     "investor": investor, "firm": firm, "ticker": ticker,
-                    "issuer": h["name"], "value": h["value"], "shares": h["shares"],
-                    "value_fmt": _fmt_usd(h["value"]), "filed": filed,
+                    "issuer": agg["issuer"], "value": agg["value"], "shares": agg["shares"],
+                    "value_fmt": _fmt_usd(agg["value"]), "filed": filed,
                 })
         except Exception as ex:  # noqa: BLE001 — one filer failing shouldn't drop the rest
             log("13F holdings: %s failed: %s" % (firm, str(ex)[:120]))

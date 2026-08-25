@@ -442,16 +442,24 @@ opinions and the balance sheet is a fact.</p>
 
     # ---------- J ----------
     if thirteenf:
+        SHOWN = 30
+        shown, hidden = thirteenf[:SHOWN], thirteenf[SHOWN:]
         A('<section id="j"><div class="sec-head"><span class="sec-key">J</span>'
           '<h2>13F holdings</h2>'
           '<span class="sec-note">Latest SEC Form 13F-HR filings, cross-checked against this universe</span></div>')
         A('<p class="lede">Free, official, and exact &mdash; every institutional manager over $100M must '
           'disclose these quarterly. But it is a <strong>quarterly snapshot, not a live signal</strong>: 13F '
           'filings can lag up to 45 days after quarter end, and a position shown here may already have been '
-          'trimmed or exited by the time you read this.</p>')
+          'trimmed or exited by the time you read this. Multi-strategy managers (Citadel, and to a lesser '
+          'extent Bridgewater, Millennium-style shops) file broad, algorithmically-driven 13Fs that reflect '
+          'market-making and hedging activity across most of the market &mdash; treat those rows as portfolio '
+          'breadth, not hand-picked conviction, unlike the concentrated bets from managers like Ackman or '
+          'Burry.%s</p>'
+          % (' Showing the %d largest positions of %d total matches.' % (len(shown), len(thirteenf))
+             if hidden else ''))
         A('<div class="tw"><table><thead><tr><th>Investor</th><th>Firm</th><th>Holding</th>'
           '<th class="num">Value</th><th class="num">Shares</th><th>Filed</th></tr></thead><tbody>')
-        for h in thirteenf:
+        for h in shown:
             A('<tr><td class="nm"><span class="co">%s</span></td><td class="sect">%s</td>'
               '<td><span class="tk">%s</span></td><td class="num sco">%s</td>'
               '<td class="num">%s</td><td class="sect">%s</td></tr>'
